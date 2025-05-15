@@ -6,6 +6,7 @@ from random import randint
 # Inicialização
 pygame.init()
 
+
 # Constantes
 LARGURA = 1920
 ALTURA = 1080
@@ -26,8 +27,14 @@ clock = pygame.time.Clock()
 fundo = pygame.image.load("bar1.png").convert()
 fundo = pygame.transform.scale(fundo, (LARGURA, ALTURA))
 spritesheet = pygame.image.load("ps1.png").convert_alpha()
-img_game_over = pygame.image.load("game_over.png").convert_alpha()  
+img_game_over = pygame.image.load("game_over.png").convert_alpha()
 img_game_over = pygame.transform.scale(img_game_over, (800, 300))
+
+# Sons
+som_pulo = pygame.mixer.Sound("pulo-luffy.mp3")
+som_morte = pygame.mixer.Sound("aiai_1.mp3")
+som_coleta = pygame.mixer.Sound("tom-scream.mp3")
+
 
 # Estados do jogo
 TELA_INICIAL = 0
@@ -86,6 +93,7 @@ class Jogador(pygame.sprite.Sprite):
         if not self.pulando:
             self.vel_y = -30
             self.pulando = True
+            som_pulo.play()
 
 class Obstaculo(pygame.sprite.Sprite):
     def __init__(self):
@@ -185,9 +193,11 @@ while True:
 
         if pygame.sprite.collide_rect(jogador, obstaculo):
             vida -= 1
+            som_morte.play()
             estado_jogo = GAME_OVER
 
         if pygame.sprite.collide_rect(jogador, lixo):
+            som_coleta.play()
             pontuacao += 1
             lixo.rect.x = LARGURA + randint(600, 1000)
 
