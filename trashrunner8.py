@@ -6,7 +6,6 @@ from random import randint
 # Inicialização
 pygame.init()
 
-
 # Constantes
 LARGURA = 1920
 ALTURA = 1080
@@ -35,7 +34,6 @@ som_pulo = pygame.mixer.Sound("pulo-luffy.mp3")
 som_morte = pygame.mixer.Sound("aiai_1.mp3")
 # som_coleta = pygame.mixer.Sound("tom-scream.mp3")
 
-
 # Estados do jogo
 TELA_INICIAL = 0
 JOGANDO = 1
@@ -49,6 +47,10 @@ multiplicador_velocidade = 1.0
 proxima_meta = 1500
 passo_meta = 2000
 passo_multiplicador = 0.1
+
+# Movimento do fundo
+pos_fundo = 0
+velocidade_fundo = 5
 
 # Botões
 play_rect = pygame.Rect(LARGURA//2 - 200, 400, 400, 100)
@@ -201,7 +203,15 @@ while True:
             pontuacao += 1
             lixo.rect.x = LARGURA + randint(600, 1000)
 
-        tela.blit(fundo, (0, 0))
+        # Atualiza posição do fundo
+        pos_fundo -= velocidade_fundo
+        if pos_fundo <= -LARGURA:
+            pos_fundo = 0
+
+        # Desenha fundo em loop
+        tela.blit(fundo, (pos_fundo, 0))
+        tela.blit(fundo, (pos_fundo + LARGURA, 0))
+
         todos.draw(tela)
 
         fonte = pygame.font.SysFont(None, 60)
