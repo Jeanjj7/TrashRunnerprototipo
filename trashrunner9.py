@@ -3,7 +3,6 @@ from pygame.locals import *
 from sys import exit
 from random import randint
 
-# Inicialização
 pygame.init()
 
 # Constantes
@@ -14,7 +13,6 @@ PRETO = (0, 0, 0)
 VERDE = (0, 200, 0)
 VERMELHO = (200, 0, 0)
 AZUL = (50, 50, 255)
-CINZA = (150, 150, 150)
 CHAO = ALTURA - 150
 
 # Tela
@@ -22,9 +20,14 @@ tela = pygame.display.set_mode((LARGURA, ALTURA))
 pygame.display.set_caption("Trash Runner")
 clock = pygame.time.Clock()
 
-# Carrega imagens
-fundo = pygame.image.load("sprite_0.png").convert()
-fundo = pygame.transform.scale(fundo, (LARGURA, ALTURA))
+# Carregando múltiplas imagens de fundo da pasta 'fundo'
+fundos = []
+for i in range(1, 5):
+    img = pygame.image.load(f"fundo/f{i}.png").convert()  # Caminho corrigido
+    img = pygame.transform.scale(img, (LARGURA, ALTURA))
+    fundos.append(img)
+
+# Spritesheet e imagens
 spritesheet = pygame.image.load("ps1.png").convert_alpha()
 img_game_over = pygame.image.load("game_over.png").convert_alpha()
 img_game_over = pygame.transform.scale(img_game_over, (800, 300))
@@ -48,9 +51,10 @@ proxima_meta = 1500
 passo_meta = 2000
 passo_multiplicador = 0.1
 
-# Movimento do fundo
-pos_fundo = 0
+# Fundo
 velocidade_fundo = 5
+num_fundos = len(fundos)
+posicoes_fundos = [i * LARGURA for i in range(num_fundos)]
 
 # Botões
 play_rect = pygame.Rect(LARGURA//2 - 200, 400, 400, 100)
@@ -131,16 +135,14 @@ lixo = Lixo()
 todos = pygame.sprite.Group(jogador, obstaculo, lixo)
 
 def desenhar_tela_inicial():
-    tela.blit(fundo, (0, 0))
+    tela.blit(fundos[0], (0, 0))
     fonte_titulo = pygame.font.SysFont("Arial Black", 140)
     logo = pygame.image.load("Trash_Runner_logo.png").convert_alpha()
     logo = pygame.transform.scale(logo, (800, 190))
     tela.blit(logo, (LARGURA//2 - logo.get_width()//2, 200))
-
     fonte_botao = pygame.font.SysFont("Arial", 70, bold=True)
     play = fonte_botao.render("PLAY", True, BRANCO)
     sair = fonte_botao.render("SAIR", True, BRANCO)
-
     pygame.draw.rect(tela, VERDE, play_rect, border_radius=20)
     pygame.draw.rect(tela, VERMELHO, sair_rect, border_radius=20)
     tela.blit(play, (play_rect.centerx - play.get_width()//2, play_rect.y + 15))
@@ -148,12 +150,10 @@ def desenhar_tela_inicial():
     pygame.display.flip()
 
 def desenhar_game_over():
-    tela.blit(fundo, (0, 0))
+    tela.blit(fundos[0], (0, 0))
     tela.blit(img_game_over, (LARGURA//2 - img_game_over.get_width()//2, 250))
-
     fonte_botao = pygame.font.SysFont("Arial", 70, bold=True)
     reiniciar = fonte_botao.render(" REINICIAR", True, PRETO)
-
     pygame.draw.rect(tela, AZUL, reiniciar_rect, border_radius=20)
     tela.blit(reiniciar, (reiniciar_rect.centerx - reiniciar.get_width()//2, reiniciar_rect.y + 15))
     pygame.display.flip()
@@ -203,21 +203,22 @@ while True:
             pontuacao += 1
             lixo.rect.x = LARGURA + randint(600, 1000)
 
-        # Atualiza posição do fundo
-        pos_fundo -= velocidade_fundo
-        if pos_fundo <= -LARGURA:
-            pos_fundo = 0
+        # Atualiza posições dos fundos
+        for i in range(num_fundos):
+            posicoes_fundos[i] -= velocidade_fundo
+            if posicoes_fundos[i] <= -LARGURA:
+                posicoes_fundos[i] = max(posicoes_fundos) + LARGURA
 
-        # Desenha fundo em loop
-        tela.blit(fundo, (pos_fundo, 0))
-        tela.blit(fundo, (pos_fundo + LARGURA, 0))
+        # Desenha os fundos
+        for i in range(num_fundos):
+            tela.blit(fundos[i], (posicoes_fundos[i], 0))
 
         todos.draw(tela)
 
         fonte = pygame.font.SysFont(None, 60)
         tela.blit(fonte.render(f"Distância: {score}", True, BRANCO), (200, 150))
         tela.blit(fonte.render(f"Pontos: {pontuacao}", True, BRANCO), (200, 200))
-        tela.blit(fonte.render(f"Velocidade: x{multiplicador_velocidade:.1f}", True, BRANCO), (200, 250))
+        tela.blit(fonte.render(f"Velocidade: {multiplicador_velocidade:.1f}", True, BRANCO), (200, 250))
         pygame.display.flip()
 
     elif estado_jogo == GAME_OVER:
