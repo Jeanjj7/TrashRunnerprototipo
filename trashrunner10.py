@@ -20,12 +20,19 @@ tela = pygame.display.set_mode((LARGURA, ALTURA))
 pygame.display.set_caption("Trash Runner")
 clock = pygame.time.Clock()
 
-# Carregando múltiplas imagens de fundo da pasta 'fundo'
+# Carregando fundos iniciais
 fundos = []
 for i in range(1, 5):
-    img = pygame.image.load(f"fundo/f{i}.png").convert()  # Caminho corrigido
+    img = pygame.image.load(f"fundo/f{i}.png").convert()
     img = pygame.transform.scale(img, (LARGURA, ALTURA))
     fundos.append(img)
+
+# Carregando fundos alternativos (após 25 lixos)
+fundos2 = []
+for i in range(1, 5):
+    img = pygame.image.load(f"fundo2/fn{i}.png").convert()
+    img = pygame.transform.scale(img, (LARGURA, ALTURA))
+    fundos2.append(img)
 
 # Spritesheet e imagens
 spritesheet = pygame.image.load("ps1.png").convert_alpha()
@@ -55,6 +62,7 @@ passo_multiplicador = 0.1
 velocidade_fundo = 5
 num_fundos = len(fundos)
 posicoes_fundos = [i * LARGURA for i in range(num_fundos)]
+fundo_atual = fundos
 
 # Botões
 play_rect = pygame.Rect(LARGURA//2 - 200, 400, 400, 100)
@@ -100,7 +108,7 @@ class Jogador(pygame.sprite.Sprite):
             self.vel_y = -30
             self.pulando = True
             som_pulo.play()
-# obstaculo
+
 class Obstaculo(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -114,7 +122,7 @@ class Obstaculo(pygame.sprite.Sprite):
         self.rect.x += -velocidade_base * multiplicador_velocidade
         if self.rect.right < 0:
             self.rect.x = LARGURA + randint(300, 600)
-# lixo
+
 class Lixo(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -136,6 +144,7 @@ todos = pygame.sprite.Group(jogador, obstaculo, lixo)
 
 def desenhar_tela_inicial():
     tela.blit(fundos[0], (0, 0))
+    fonte_titulo = pygame.font.SysFont("Arial Black", 140)
     logo = pygame.image.load("Trash_Runner_logo.png").convert_alpha()
     logo = pygame.transform.scale(logo, (800, 190))
     tela.blit(logo, (LARGURA//2 - logo.get_width()//2, 200))
@@ -173,6 +182,7 @@ while True:
                     pontuacao = 0
                     multiplicador_velocidade = 1.0
                     proxima_meta = 1500
+                    fundo_atual = fundos
                 elif sair_rect.collidepoint(evento.pos):
                     pygame.quit()
                     exit()
@@ -202,6 +212,11 @@ while True:
             pontuacao += 1
             lixo.rect.x = LARGURA + randint(600, 1000)
 
+            # Verifica se atingiu 25 lixos coletados
+            if pontuacao == 10:
+                multiplicador_velocidade = 1.5
+                fundo_atual = fundos2
+
         # Atualiza posições dos fundos
         for i in range(num_fundos):
             posicoes_fundos[i] -= velocidade_fundo
@@ -210,7 +225,7 @@ while True:
 
         # Desenha os fundos
         for i in range(num_fundos):
-            tela.blit(fundos[i], (posicoes_fundos[i], 0))
+            tela.blit(fundo_atual[i], (posicoes_fundos[i], 0))
 
         todos.draw(tela)
 
@@ -237,4 +252,5 @@ while True:
                     lixo.rect.x = LARGURA + randint(600, 1000)
                     multiplicador_velocidade = 1.0
                     proxima_meta = 1500
+                    fundo_atual = fundos
                     estado_jogo = JOGANDO

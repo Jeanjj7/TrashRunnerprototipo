@@ -23,7 +23,7 @@ pygame.display.set_caption("Trash Runner")
 clock = pygame.time.Clock()
 
 # Carrega imagens
-fundo = pygame.image.load("sprite_0.png").convert()
+fundo = pygame.image.load("bar1.png").convert()
 fundo = pygame.transform.scale(fundo, (LARGURA, ALTURA))
 spritesheet = pygame.image.load("ps1.png").convert_alpha()
 img_game_over = pygame.image.load("game_over.png").convert_alpha()

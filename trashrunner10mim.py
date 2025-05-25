@@ -20,12 +20,20 @@ tela = pygame.display.set_mode((LARGURA, ALTURA))
 pygame.display.set_caption("Trash Runner")
 clock = pygame.time.Clock()
 
-# Carregando múltiplas imagens de fundo da pasta 'fundo'
+# Carregando fundos
 fundos = []
 for i in range(1, 5):
-    img = pygame.image.load(f"fundo/f{i}.png").convert()  # Caminho corrigido
+    img = pygame.image.load(f"fundo/f{i}.png").convert()
     img = pygame.transform.scale(img, (LARGURA, ALTURA))
     fundos.append(img)
+
+fundos2 = []
+for i in range(1, 5):
+    img = pygame.image.load(f"fundo2/fn{i}.png").convert()
+    img = pygame.transform.scale(img, (LARGURA, ALTURA))
+    fundos2.append(img)
+
+fundo_atual = fundos
 
 # Spritesheet e imagens
 spritesheet = pygame.image.load("ps1.png").convert_alpha()
@@ -42,14 +50,20 @@ TELA_INICIAL = 0
 JOGANDO = 1
 GAME_OVER = 2
 estado_jogo = TELA_INICIAL
+
 vida = 1
 pontuacao = 0
 score = 0
+
 velocidade_base = 10
 multiplicador_velocidade = 1.0
+
 proxima_meta = 1500
 passo_meta = 2000
 passo_multiplicador = 0.1
+
+# Controle do fundo quando pegar 25 lixos
+fundo_trocado = False
 
 # Fundo
 velocidade_fundo = 5
@@ -100,7 +114,7 @@ class Jogador(pygame.sprite.Sprite):
             self.vel_y = -30
             self.pulando = True
             som_pulo.play()
-# obstaculo
+
 class Obstaculo(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -114,7 +128,7 @@ class Obstaculo(pygame.sprite.Sprite):
         self.rect.x += -velocidade_base * multiplicador_velocidade
         if self.rect.right < 0:
             self.rect.x = LARGURA + randint(300, 600)
-# lixo
+
 class Lixo(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -136,6 +150,7 @@ todos = pygame.sprite.Group(jogador, obstaculo, lixo)
 
 def desenhar_tela_inicial():
     tela.blit(fundos[0], (0, 0))
+    fonte_titulo = pygame.font.SysFont("Arial Black", 140)
     logo = pygame.image.load("Trash_Runner_logo.png").convert_alpha()
     logo = pygame.transform.scale(logo, (800, 190))
     tela.blit(logo, (LARGURA//2 - logo.get_width()//2, 200))
@@ -149,7 +164,7 @@ def desenhar_tela_inicial():
     pygame.display.flip()
 
 def desenhar_game_over():
-    tela.blit(fundos[0], (0, 0))
+    tela.blit(fundo_atual[0], (0, 0))
     tela.blit(img_game_over, (LARGURA//2 - img_game_over.get_width()//2, 250))
     fonte_botao = pygame.font.SysFont("Arial", 70, bold=True)
     reiniciar = fonte_botao.render(" REINICIAR", True, PRETO)
@@ -173,6 +188,8 @@ while True:
                     pontuacao = 0
                     multiplicador_velocidade = 1.0
                     proxima_meta = 1500
+                    fundo_atual = fundos
+                    fundo_trocado = False
                 elif sair_rect.collidepoint(evento.pos):
                     pygame.quit()
                     exit()
@@ -201,6 +218,12 @@ while True:
             # som_coleta.play()
             pontuacao += 1
             lixo.rect.x = LARGURA + randint(600, 1000)
+            # a velocidade 
+            if pontuacao % 5 == 0:
+                multiplicador_velocidade += 0.5
+                if not fundo_trocado:
+                    fundo_atual = fundos2
+                    fundo_trocado = True
 
         # Atualiza posições dos fundos
         for i in range(num_fundos):
@@ -210,14 +233,14 @@ while True:
 
         # Desenha os fundos
         for i in range(num_fundos):
-            tela.blit(fundos[i], (posicoes_fundos[i], 0))
+            tela.blit(fundo_atual[i], (posicoes_fundos[i], 0))
 
         todos.draw(tela)
 
         fonte = pygame.font.SysFont(None, 60)
         tela.blit(fonte.render(f"Distância: {score}", True, BRANCO), (200, 150))
         tela.blit(fonte.render(f"Pontos: {pontuacao}", True, BRANCO), (200, 200))
-        tela.blit(fonte.render(f"Velocidade: {multiplicador_velocidade:.1f}", True, BRANCO), (200, 250))
+        tela.blit(fonte.render(f"Velocidade: {velocidade_base * multiplicador_velocidade:.1f}", True, BRANCO), (200, 250))
         pygame.display.flip()
 
     elif estado_jogo == GAME_OVER:
@@ -237,4 +260,11 @@ while True:
                     lixo.rect.x = LARGURA + randint(600, 1000)
                     multiplicador_velocidade = 1.0
                     proxima_meta = 1500
+                    fundo_atual = fundos
+                    fundo_trocado = False
                     estado_jogo = JOGANDO
+
+
+# colocar mais mundos 
+# colocar a imagem da fafire 
+# depois de morre fica maias bonito 
