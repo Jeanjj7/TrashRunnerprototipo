@@ -32,7 +32,7 @@ for i in range(1, 5):
     img = pygame.image.load(f"fundo2/fn{i}.png").convert()
     img = pygame.transform.scale(img, (LARGURA, ALTURA))
     fundos2.append(img)
-    
+
 fundos3 = []
 for i in range(1, 5):
     img = pygame.image.load(f"fundo3/fl{i}.png").convert()
@@ -68,8 +68,9 @@ proxima_meta = 1500
 passo_meta = 2000
 passo_multiplicador = 0.1
 
-# Controle do fundo quando pegar 25 lixos
-fundo_trocado = False
+# Controle do fundo quando pegar lixo
+fundo2_ativado = False
+fundo3_ativado = False
 
 # Fundo
 velocidade_fundo = 5
@@ -195,7 +196,8 @@ while True:
                     multiplicador_velocidade = 1.0
                     proxima_meta = 1500
                     fundo_atual = fundos
-                    fundo_trocado = False
+                    fundo2_ativado = False
+                    fundo3_ativado = False
                 elif sair_rect.collidepoint(evento.pos):
                     pygame.quit()
                     exit()
@@ -224,12 +226,19 @@ while True:
             # som_coleta.play()
             pontuacao += 1
             lixo.rect.x = LARGURA + randint(600, 1000)
-            # a velocidade 
+
+            # Trocar fundo e velocidade baseado na pontuacao
+            if pontuacao >= 10 and not fundo3_ativado:
+                fundo_atual = fundos3
+                fundo3_ativado = True
+                fundo2_ativado = False  # para garantir
+            elif pontuacao >= 5 and not fundo2_ativado and not fundo3_ativado:
+                fundo_atual = fundos2
+                fundo2_ativado = True
+
+            # Aumentar velocidade a cada 5 lixos coletados
             if pontuacao % 5 == 0:
                 multiplicador_velocidade += 0.5
-                if not fundo_trocado:
-                    fundo_atual = fundos2
-                    fundo_trocado = True
 
         # Atualiza posições dos fundos
         for i in range(num_fundos):
@@ -267,10 +276,6 @@ while True:
                     multiplicador_velocidade = 1.0
                     proxima_meta = 1500
                     fundo_atual = fundos
-                    fundo_trocado = False
+                    fundo2_ativado = False
+                    fundo3_ativado = False
                     estado_jogo = JOGANDO
-
-
-# colocar mais mundos 
-# colocar a imagem da fafire 
-# depois de morre fica maias bonito 
