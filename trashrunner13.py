@@ -38,6 +38,13 @@ for i in range(1, 5):
     img = pygame.image.load(f"fundo3/fl{i}.png").convert()
     img = pygame.transform.scale(img, (LARGURA, ALTURA))
     fundos3.append(img)
+    
+fundos4 = [] 
+for i in range(1, 5):
+    img = pygame.image.load(f"fundo4/flr{i}.png").convert()
+    img = pygame.transform.scale(img, (LARGURA, ALTURA))
+    fundos4.append(img)  
+
 
 fundo_atual = fundos
 
@@ -247,18 +254,27 @@ while True:
             pontuacao += 1
             lixo.rect.x = LARGURA + randint(600, 1000)
 
-            # Trocar fundo e abrir tela de missão
-            if pontuacao >= 10 and not fundo3_ativado:
-                fundo_atual = fundos3
-                fundo3_ativado = True
-                fundo2_ativado = False
-                estado_jogo = TELA_MISSAO
-            elif pontuacao >= 5 and not fundo2_ativado and not fundo3_ativado:
-                fundo_atual = fundos2
-                fundo2_ativado = True
-                estado_jogo = TELA_MISSAO
+        # Trocar fundo e abrir tela de missão
+        if pontuacao >= 60 and not fundo4_ativado:
+            fundo_atual = fundos4
+            fundo4_ativado = True
+            fundo3_ativado = False
+            fundo2_ativado = False
+            estado_jogo = TELA_MISSAO
 
-            if pontuacao % 5 == 0:
+        elif pontuacao >= 40 and not fundo3_ativado and not fundo4_ativado:
+            fundo_atual = fundos3
+            fundo3_ativado = True
+            fundo2_ativado = False
+            estado_jogo = TELA_MISSAO
+
+        elif pontuacao >= 20 and not fundo2_ativado and not fundo3_ativado and not fundo4_ativado:
+            fundo_atual = fundos2
+            fundo2_ativado = True
+            estado_jogo = TELA_MISSAO
+
+            
+            if pontuacao % 20 == 0:
                 multiplicador_velocidade += 0.5
 
         for i in range(num_fundos):
@@ -308,4 +324,6 @@ while True:
                     fundo_atual = fundos
                     fundo2_ativado = False
                     fundo3_ativado = False
+                    fundo4_ativado = False 
                     estado_jogo = JOGANDO
+
