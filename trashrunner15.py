@@ -3,6 +3,7 @@ from pygame.locals import *
 from sys import exit
 from random import randint
 
+
 pygame.init()
 
 # Constantes
@@ -40,6 +41,8 @@ fundo_atual = fundos
 spritesheet = pygame.image.load("ps1.png").convert_alpha()
 img_game_over = pygame.image.load("game_over.png").convert_alpha()
 img_game_over = pygame.transform.scale(img_game_over, (800, 300))
+img_lixo = pygame.image.load("coletadolixo.png").convert_alpha()
+img_lixo = pygame.transform.scale(img_lixo, (60, 60))  # ajuste o tamanho se necessário
 
 # Sons
 som_pulo = pygame.mixer.Sound("pulo-luffy.mp3")
@@ -266,7 +269,9 @@ while True:
 
         fonte = pygame.font.SysFont(None, 60)
         tela.blit(fonte.render(f"Distância: {score}", True, BRANCO), (200, 150))
-        tela.blit(fonte.render(f"Pontos: {pontuacao}", True, BRANCO), (200, 200))
+        tela.blit(img_lixo, (200, 200))  # desenha o ícone do lixo
+        tela.blit(fonte.render(f"{pontuacao}", True, BRANCO), (270, 210))  # desenha o número ao lado
+
         # tela.blit(fonte.render(f"Velocidade: {velocidade_base * multiplicador_velocidade:.1f}", True, BRANCO), (200, 250))
         pygame.display.flip()
 
