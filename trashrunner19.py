@@ -50,8 +50,6 @@ img_lixo = pygame.transform.scale(img_lixo, (100, 100))
 som_pulo = pygame.mixer.Sound("pulo-luffy.mp3")
 som_morte = pygame.mixer.Sound("aiai_1.mp3")
 
-
-
 pygame.mixer.init()
 pygame.mixer.music.load('Burn_Rubber.mp3') 
 pygame.mixer.music.play(-1, 0.0) 
@@ -154,25 +152,27 @@ class Lixo(pygame.sprite.Sprite):
         self.rect.x += -velocidade_base * multiplicador_velocidade
         if self.rect.right < 0:
             self.rect.x = LARGURA + randint(600, 1000)
-            
-class LixoTipo2(pygame.sprite.Sprite):
+
+class Lixo2(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
         self.image = pygame.image.load("lixo2.png").convert_alpha()
         self.image = pygame.transform.scale(self.image, (150, 150))
         self.rect = self.image.get_rect()
-        self.rect.x = LARGURA + randint(1000, 1400)
+        self.rect.x = LARGURA + randint(1000, 1600)
         self.rect.y = CHAO - self.rect.height
 
     def update(self):
         self.rect.x += -velocidade_base * multiplicador_velocidade
         if self.rect.right < 0:
-            self.rect.x = LARGURA + randint(1000, 1400)
+            self.rect.x = LARGURA + randint(1000, 1600)
+
 
 jogador = Jogador()
 obstaculo = Obstaculo()
-lixo = Lixo()
-todos = pygame.sprite.Group(jogador, obstaculo, lixo)
+lixo1 = Lixo()
+lixo2 = Lixo2()
+todos = pygame.sprite.Group(jogador, obstaculo, lixo1, lixo2)
 
 def desenhar_tela_inicial():
     tela.blit(fundos[0], (0, 0))
@@ -199,21 +199,17 @@ def desenhar_game_over():
     fonte_info = pygame.font.SysFont("Arial Black", 80)
     fonte_botao = pygame.font.SysFont("Arial", 70, bold=True)
 
-    # Mostrando Distância e Pontuação
     texto1 = fonte_info.render(f"Distância: {score}", True, VERDE_ESCURO)
     texto2 = fonte_info.render(f"Lixo coletado: {pontuacao}", True, AZUL)
 
     tela.blit(texto1, (LARGURA // 2 - texto1.get_width() // 2 - 1, 500))
     tela.blit(texto2, (LARGURA // 2 - texto2.get_width() // 2 - 1, 580))
 
-    # texto verde por cima
     texto1_colorido = fonte_info.render(f"Distância: {score}", True, VERDE)
     texto2_colorido = fonte_info.render(f"Lixo coletado: {pontuacao}", True, BRANCO)
 
     tela.blit(texto1_colorido, (LARGURA // 2 - texto1_colorido.get_width() // 2, 490))
     tela.blit(texto2_colorido, (LARGURA // 2 - texto2_colorido.get_width() // 2, 570))
-
-
 
     reiniciar = fonte_botao.render(" REINICIAR", True, BRANCO)
     pygame.draw.rect(tela, AZUL, reiniciar_rect, border_radius=20)
@@ -275,30 +271,30 @@ while True:
             som_morte.play()
             estado_jogo = GAME_OVER
 
+        for lixo in [lixo1, lixo2]:
+            if pygame.sprite.collide_rect(jogador, lixo):
+                pontuacao += 1
+                lixo.rect.x = LARGURA + randint(600, 1600)
 
-        if pygame.sprite.collide_rect(jogador, lixo):
-            pontuacao += 1
-            lixo.rect.x = LARGURA + randint(600, 1000)
-            
-            if pontuacao >= 80 and nivel_fundo < 5:
-                fundo_atual = fundos5
-                nivel_fundo = 5
-                estado_jogo = TELA_MISSAO
-            if pontuacao >= 60 and nivel_fundo < 4:
-                fundo_atual = fundos4
-                nivel_fundo = 4
-                estado_jogo = TELA_MISSAO
-            elif pontuacao >= 40 and nivel_fundo < 3:
-                fundo_atual = fundos3
-                nivel_fundo = 3
-                estado_jogo = TELA_MISSAO
-            elif pontuacao >= 20 and nivel_fundo < 2:
-                fundo_atual = fundos2
-                nivel_fundo = 2
-                estado_jogo = TELA_MISSAO
+                if pontuacao >= 80 and nivel_fundo < 5:
+                    fundo_atual = fundos5
+                    nivel_fundo = 5
+                    estado_jogo = TELA_MISSAO
+                if pontuacao >= 60 and nivel_fundo < 4:
+                    fundo_atual = fundos4
+                    nivel_fundo = 4
+                    estado_jogo = TELA_MISSAO
+                elif pontuacao >= 40 and nivel_fundo < 3:
+                    fundo_atual = fundos3
+                    nivel_fundo = 3
+                    estado_jogo = TELA_MISSAO
+                elif pontuacao >= 20 and nivel_fundo < 2:
+                    fundo_atual = fundos2
+                    nivel_fundo = 2
+                    estado_jogo = TELA_MISSAO
 
-            if pontuacao % 20 == 0:
-                multiplicador_velocidade += 0.5
+                if pontuacao % 20 == 0:
+                    multiplicador_velocidade += 0.5
 
         for i in range(num_fundos):
             posicoes_fundos[i] -= velocidade_fundo
@@ -348,7 +344,8 @@ while True:
                     jogador.rect.y = CHAO - jogador.rect.height
                     jogador.vel_y = 0
                     obstaculo.rect.x = LARGURA
-                    lixo.rect.x = LARGURA + randint(600, 1000)
+                    lixo1.rect.x = LARGURA + randint(600, 1000)
+                    lixo2.rect.x = LARGURA + randint(1000, 1600)
                     multiplicador_velocidade = 1.0
                     proxima_meta = 1500
                     nivel_fundo = 1
